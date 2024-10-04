@@ -75,14 +75,18 @@
     <div class="container">
         <h2>Upload Eye Image for Alcohol Detection</h2>
         <form action="result.html" method="POST" enctype="multipart/form-data" onsubmit="return validateImage()">
-            <!-- Hidden input for selecting a file or taking a photo -->
-            <input type="file" id="eyeImage" name="eyeImage" accept="image/*" capture="camera">
+            
+            <!-- File Input for Selecting from Files -->
+            <input type="file" id="fileInput" name="eyeImageFile" accept="image/*">
+            
+            <!-- File Input for Camera Capture -->
+            <input type="file" id="cameraInput" name="eyeImageCamera" accept="image/*" capture="camera">
+            
+            <!-- Choose File Button -->
+            <button type="button" onclick="document.getElementById('fileInput').click();">Choose File</button>
 
-            <!-- Button to trigger file input dialog -->
-            <button type="button" onclick="document.getElementById('eyeImage').click();">Choose File</button>
-
-            <!-- Take a Photo button that triggers the camera -->
-            <button type="button" class="photo-button" onclick="document.getElementById('eyeImage').click();">Take a Photo</button>
+            <!-- Take a Photo Button -->
+            <button type="button" class="photo-button" onclick="document.getElementById('cameraInput').click();">Take a Photo</button>
 
             <button type="submit">Detect</button>
 
@@ -94,13 +98,14 @@
     </div>
 
     <script>
-        const fileInput = document.getElementById('eyeImage');
+        const fileInput = document.getElementById('fileInput');
+        const cameraInput = document.getElementById('cameraInput');
         const imgPreview = document.getElementById('imagePreview');
         const errorMessage = document.getElementById('error-message');
 
-        // Display the selected or captured image in the preview
-        fileInput.addEventListener('change', function() {
-            const file = fileInput.files[0];
+        // Preview the selected or captured image
+        function previewImage(input) {
+            const file = input.files[0];
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -111,17 +116,27 @@
             } else {
                 errorMessage.textContent = 'Please upload a valid image file.';
             }
+        }
+
+        // Event listener for file selection
+        fileInput.addEventListener('change', function() {
+            previewImage(fileInput);
         });
 
+        // Event listener for camera capture
+        cameraInput.addEventListener('change', function() {
+            previewImage(cameraInput);
+        });
+
+        // Validate image before submission
         function validateImage() {
-            const file = fileInput.files[0];
-            if (file && file.type.startsWith('image/')) {
-                return true; // Allow form submission
-            } else {
-                errorMessage.textContent = 'Please upload or capture a valid image.';
-                return false; // Prevent form submission
+            if (!fileInput.files.length && !cameraInput.files.length) {
+                errorMessage.textContent = 'Please upload or capture an image.';
+                return false;
             }
+            return true;
         }
     </script>
 </body>
 </html>
+
